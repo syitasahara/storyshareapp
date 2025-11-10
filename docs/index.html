@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShareYourStory - Berbagi Cerita Inspiratif</title>
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/icons/icon-192x192.png">
+    
+    <!-- Leaflet CSS untuk peta -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script type="module" crossorigin src="/assets/index-B5PYlZDb.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-sMb5mRfx.css">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <header class="main-header">
+        <div class="container">
+            <a class="brand-name" href="#/">ShareYourStory</a>
+            
+            <nav id="navigation-drawer" class="navigation-drawer">
+                <ul class="nav-list">
+                    <li><a href="#/" class="nav-link">Beranda</a></li>
+                    <li><a href="#/stories" class="nav-link">Cerita</a></li>
+                    <li><a href="#/map" class="nav-link">Peta</a></li>
+                    <li><a href="#/about" class="nav-link">Tentang</a></li>
+                    <li id="auth-nav-item">
+                        <a href="#/login" id="auth-link" class="nav-link">Masuk</a>
+                    </li>
+                    <li><a href="#/settings" class="nav-link">Pengaturan</a></li>
+                </ul>
+            </nav>
+            
+            <button id="drawer-button" class="drawer-button" aria-label="Toggle navigation menu">☰</button>
+        </div>
+    </header>
+
+    <main id="main-content" class="main-content">
+        <!-- Konten halaman akan dimuat di sini -->
+    </main>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', async () => {
+                try {
+                    const registration = await navigator.serviceWorker.register('/sw.js');
+                    console.log('ServiceWorker registered successfully:', registration);
+                    
+                    // Check for updates
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        console.log('New service worker found:', newWorker);
+                    });
+                } catch (error) {
+                    console.error('ServiceWorker registration failed:', error);
+                }
+            });
+        }
+    </script>
+    
+    <!-- Aplikasi JavaScript -->
+</body>
+</html>
