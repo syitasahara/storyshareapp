@@ -36,7 +36,6 @@ const urlsToCache = [
   "/icons/icon-512x512.png",
 ];
 
-// Install event - cache static assets termasuk JavaScript modules
 self.addEventListener("install", (event) => {
   console.log("Service Worker installing...");
   event.waitUntil(
@@ -49,7 +48,6 @@ self.addEventListener("install", (event) => {
             "Cache addAll error (some files might be missing):",
             error
           );
-          // Continue even if some files fail to cache
         });
       })
       .then(() => {
@@ -59,20 +57,15 @@ self.addEventListener("install", (event) => {
   );
 });
 
-// Enhanced fetch event dengan handling untuk JavaScript modules
 self.addEventListener("fetch", (event) => {
-  // Skip non-GET requests
   if (event.request.method !== "GET") return;
 
-  // Skip Chrome extensions
   if (event.request.url.startsWith("chrome-extension://")) return;
 
-  // Handle different types of requests
   if (
     event.request.destination === "script" ||
     event.request.url.includes(".js")
   ) {
-    // JavaScript files - cache first, then network
     event.respondWith(
       caches.match(event.request).then((response) => {
         if (response) {
@@ -80,7 +73,6 @@ self.addEventListener("fetch", (event) => {
           return response;
         }
 
-        // Jika tidak ada di cache, fetch dari network
         return fetch(event.request)
           .then((networkResponse) => {
             // Cache the new response
@@ -93,7 +85,6 @@ self.addEventListener("fetch", (event) => {
             return networkResponse;
           })
           .catch(() => {
-            // Jika fetch gagal dan file JavaScript, coba berikan fallback
             if (event.request.url.includes(".js")) {
               return new Response(
                 `console.log('Module ${event.request.url} failed to load'); export default {};`,
@@ -104,11 +95,9 @@ self.addEventListener("fetch", (event) => {
       })
     );
   } else if (event.request.url.includes("/v1/")) {
-    // API requests - network first, then cache
     event.respondWith(
       fetch(event.request)
         .then((response) => {
-          // Cache successful API responses
           if (response.status === 200) {
             const responseToCache = response.clone();
             caches.open(CACHE_NAME).then((cache) => {
@@ -118,35 +107,27 @@ self.addEventListener("fetch", (event) => {
           return response;
         })
         .catch(() => {
-          // If network fails, try cache
           return caches.match(event.request);
         })
     );
   } else {
-    // Static assets - cache first, then network
     event.respondWith(
       caches.match(event.request).then((response) => {
-        // Return cached version or fetch from network
         return response || fetch(event.request);
       })
     );
   }
 });
 
-// Fetch event - serve from cache or network
 self.addEventListener("fetch", (event) => {
-  // Skip cross-origin requests
   if (!event.request.url.startsWith(self.location.origin)) {
     return;
   }
 
-  // Handle API requests differently
   if (event.request.url.includes("/v1/")) {
-    // For API requests, try network first, then cache
     event.respondWith(
       fetch(event.request)
         .then((response) => {
-          // Cache successful API responses
           if (response.status === 200) {
             const responseToCache = response.clone();
             caches.open(CACHE_NAME).then((cache) => {
@@ -156,22 +137,18 @@ self.addEventListener("fetch", (event) => {
           return response;
         })
         .catch(() => {
-          // If network fails, try cache
           return caches.match(event.request);
         })
     );
   } else {
-    // For static assets, try cache first, then network
     event.respondWith(
       caches.match(event.request).then((response) => {
-        // Return cached version or fetch from network
         return response || fetch(event.request);
       })
     );
   }
 });
 
-// Push event - handle push notifications
 self.addEventListener("push", (event) => {
   console.log("Push event received:", event);
 
@@ -212,7 +189,6 @@ self.addEventListener("notificationclick", (event) => {
   event.notification.close();
 
   if (event.action === "view") {
-    // Open the app to view stories
     event.waitUntil(
       clients.matchAll({ type: "window" }).then((clientList) => {
         // If app is already open, focus it
@@ -221,22 +197,18 @@ self.addEventListener("notificationclick", (event) => {
             return client.focus();
           }
         }
-        // Otherwise open new window
         if (clients.openWindow) {
           return clients.openWindow(event.notification.data.url || "/");
         }
       })
     );
   } else if (event.action === "dismiss") {
-    // Notification dismissed, do nothing
     console.log("Notification dismissed");
   } else {
-    // Default click behavior
     event.waitUntil(clients.openWindow(event.notification.data.url || "/"));
   }
 });
 
-// Background sync for offline story submissions
 self.addEventListener("sync", (event) => {
   console.log("Background sync event:", event);
 

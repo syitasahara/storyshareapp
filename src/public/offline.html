@@ -175,12 +175,10 @@
     </div>
 
     <script>
-        // Coba reload ketika online
         window.addEventListener('online', () => {
             window.location.reload();
         });
 
-        // Periodic check for connection
         setInterval(() => {
             if (navigator.onLine) {
                 window.location.reload();
